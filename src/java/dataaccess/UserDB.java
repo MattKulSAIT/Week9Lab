@@ -77,7 +77,7 @@ public class UserDB {
     //These might also cause a problem
     public void updateUser(String email, String fname, String lname, int role){
         EntityManager em = DBUtil.getEmFactory().createEntityManager();
-        EntityTransaction trans= em.getTransaction();
+        EntityTransaction trans = em.getTransaction();
         User thecurrent = em.find(User.class, email); 
         String password = thecurrent.getPassword();
         User user = new User(email,fname,lname,password);
@@ -102,7 +102,6 @@ public class UserDB {
            User user = em.find(User.class, email); 
            trans.begin();
            em.remove(user);
-           em.merge(user);
            trans.commit();
         } 
         catch(Exception e){
@@ -118,6 +117,9 @@ public class UserDB {
         EntityManager em = DBUtil.getEmFactory().createEntityManager();
         EntityTransaction trans= em.getTransaction();
         User user = new User(email,fname,lname,password);
+        
+        em.createNamedQuery("Role.findByRoleId", Role.class); //Some junk is broke here I think I need to assign the role and stuff
+        user.setRole(em.createNamedQuery("Role.findByRoleId", Role.class).getResultList());
          try {
            trans.begin();
            em.persist(user);

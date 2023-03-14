@@ -71,7 +71,7 @@ public class UserServlet extends HttpServlet {
             else{
                 DBconnection.updateUser(email, fname, lname, pass, roleIdNum);
             }
-            ArrayList<User> updateUsers = (ArrayList<User>)DBconnection.getall();
+            List<User> updateUsers = (List<User>)DBconnection.getall();
             request.setAttribute("users", updateUsers);
             String bottom = "Add User";
             request.setAttribute("subTitle", bottom);
@@ -81,7 +81,7 @@ public class UserServlet extends HttpServlet {
             DBconnection.delete(email);
             String bottom = "Add User";
             request.setAttribute("subTitle", bottom);
-            ArrayList<User> updateUsers = (ArrayList<User>)DBconnection.getall();
+            List<User> updateUsers = (List<User>)DBconnection.getall();
             request.setAttribute("users", updateUsers);
             
         }
@@ -109,7 +109,7 @@ public class UserServlet extends HttpServlet {
             int role = Integer.parseInt(roleId);
             DBconnection.addUser(email, fname, lname, pass, role);
         }
-            ArrayList<User> updateUsers = (ArrayList<User>)DBconnection.getall();
+            List<User> updateUsers = (List<User>)DBconnection.getall();
             request.setAttribute("users", updateUsers);
             String bottom = "Add User";
             request.setAttribute("subTitle", bottom);
