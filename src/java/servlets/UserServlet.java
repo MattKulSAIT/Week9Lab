@@ -9,6 +9,7 @@ import dataaccess.RoleDB;
 import dataaccess.UserDB;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,10 +29,10 @@ public class UserServlet extends HttpServlet {
             throws ServletException, IOException {
         UserDB DBconnection = new UserDB();
         RoleDB roleConnection = new RoleDB();
-        ArrayList<User> users = new ArrayList<>();
-        ArrayList<Role> roles = new ArrayList<>();
-        users = (ArrayList<User>)DBconnection.getall();
-        roles = (ArrayList<Role>)roleConnection.getall();
+        List<User> users = new ArrayList<>();
+        List<Role> roles = new ArrayList<>();
+        users = (List<User>)DBconnection.getall();
+        roles = (List<Role>)roleConnection.getall();
         int size = users.size();
         if (size == 0){
             request.setAttribute("people", "no");
