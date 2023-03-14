@@ -7,11 +7,9 @@ package dataaccess;
 
 import java.util.ArrayList;
 import models.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 /**
  *
  * @author mdkul
@@ -58,100 +56,79 @@ public class UserDB {
      return null;
     }
     
-    
+    //These might also cause a problem
     public void updateUser(String email, String fname, String lname, String password, int role){
-        ConnectionPool cp = ConnectionPool.getInstance();
-        Connection con = cp.getConnection();
-        PreparedStatement ps = null;
-        
-        String sql = "Update user set first_name = ?, last_name = ?, role = ?, password = ? where email = ?";
-        
-        try {
-            ps = con.prepareStatement(sql);
-            ps.setString(1, fname);
-            ps.setString(2, lname);
-            ps.setString(3, role+"");
-            ps.setString(4, password);
-            ps.setString(5, email);
-            ps.executeUpdate();
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans= em.getTransaction();
+        User user = new User(email,fname,lname,password);
+         try {
+           trans.begin();
+           em.merge(user);
+           trans.commit();
         } 
         catch(Exception e){
-            
+            trans.rollback();
         }
             finally {
-            DBUtil.closePreparedStatement(ps);
-            cp.freeConnection(con);
+            em.close();
         }
     }
 
-    
+    //These might also cause a problem
     public void updateUser(String email, String fname, String lname, int role){
-        ConnectionPool cp = ConnectionPool.getInstance();
-        Connection con = cp.getConnection();
-        PreparedStatement ps = null;
-        
-        String sql = "Update user set first_name = ?, last_name = ?, role = ? where email = ?";
-        
-        try {
-            ps = con.prepareStatement(sql);
-            ps.setString(1, fname);
-            ps.setString(2, lname);
-            ps.setString(3, role+"");
-            ps.setString(4, email);
-            ps.executeUpdate();
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans= em.getTransaction();
+        User thecurrent = em.find(User.class, email); 
+        String password = thecurrent.getPassword();
+        User user = new User(email,fname,lname,password);
+         try {
+           trans.begin();
+           em.merge(user);
+           trans.commit();
         } 
         catch(Exception e){
-            
+            trans.rollback();
         }
             finally {
-            DBUtil.closePreparedStatement(ps);
-            cp.freeConnection(con);
+            em.close();
         }
     }
     
     public void delete(String email){
-        ConnectionPool cp = ConnectionPool.getInstance();
-        Connection con = cp.getConnection();
-        PreparedStatement ps = null;
-        
-         String sql = "delete from user where email = ?";
-         
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans= em.getTransaction();
+       
          try {
-            ps = con.prepareStatement(sql);
-            ps.setString(1, email);
-            ps.executeUpdate();
+           User user = em.find(User.class, email); 
+           trans.begin();
+           em.remove(user);
+           em.merge(user);
+           trans.commit();
         } 
         catch(Exception e){
-            
+            trans.rollback();
         }
             finally {
-            DBUtil.closePreparedStatement(ps);
-            cp.freeConnection(con);
+            em.close();
         }
     }
     
+    //This will be problematic as the user is never getting a role, I will have to fix this at a later date 
     public void addUser(String email,  String fname, String lname, String password, int id){
-        ConnectionPool cp = ConnectionPool.getInstance();
-        Connection con = cp.getConnection();
-        PreparedStatement ps = null;
-        
-         String sql = "insert into user(email, first_name, last_name, password, role) values(?,?,?,?,?)";
-         
+        EntityManager em = DBUtil.getEmFactory().createEntityManager();
+        EntityTransaction trans= em.getTransaction();
+        User user = new User(email,fname,lname,password);
          try {
-            ps = con.prepareStatement(sql);
-            ps.setString(1, email);
-            ps.setString(2, fname);
-            ps.setString(3, lname);
-            ps.setString(4, password);
-            ps.setInt(5, id);
-            ps.executeUpdate();
+           trans.begin();
+           em.persist(user);
+           em.merge(user);
+           trans.commit();
         } 
         catch(Exception e){
-            
+            trans.rollback();
         }
             finally {
-            DBUtil.closePreparedStatement(ps);
-            cp.freeConnection(con);
+            em.close();
         }
     }
 }
