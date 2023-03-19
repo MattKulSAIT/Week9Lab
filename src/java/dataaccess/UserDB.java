@@ -10,6 +10,7 @@ import models.*;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
 /**
  *
  * @author mdkul
@@ -63,6 +64,9 @@ public class UserDB {
         User user = new User(email,fname,lname,password);
          try {
            trans.begin();
+           Query q = em.createNamedQuery("Role.findByRoleId");
+            q.setParameter("roleId", role);
+            user.setRole((Role)q.getSingleResult());
            em.merge(user);
            trans.commit();
         } 
@@ -83,6 +87,9 @@ public class UserDB {
         User user = new User(email,fname,lname,password);
          try {
            trans.begin();
+           Query q = em.createNamedQuery("Role.findByRoleId");
+            q.setParameter("roleId", role);
+            user.setRole((Role)q.getSingleResult());
            em.merge(user);
            trans.commit();
         } 
@@ -112,25 +119,25 @@ public class UserDB {
         }
     }
     
-    //This will be problematic as the user is never getting a role, I will have to fix this at a later date 
-    public void addUser(String email,  String fname, String lname, String password, int id){
-        EntityManager em = DBUtil.getEmFactory().createEntityManager();
-        EntityTransaction trans= em.getTransaction();
+    
+    public void addUser(String email, String fname, String lname, String password, int id) {
+    EntityManager em = DBUtil.getEmFactory().createEntityManager();
+    EntityTransaction trans = null;
+    try {
+        trans = em.getTransaction();
+        trans.begin();
         User user = new User(email,fname,lname,password);
-        
-        em.createNamedQuery("Role.findByRoleId", Role.class); //Some junk is broke here I think I need to assign the role and stuff
-        user.setRole(em.createNamedQuery("Role.findByRoleId", Role.class).getResultList());
-         try {
-           trans.begin();
-           em.persist(user);
-           em.merge(user);
-           trans.commit();
-        } 
-        catch(Exception e){
+        Query q = em.createNamedQuery("Role.findByRoleId");
+        q.setParameter("roleId", id);
+        user.setRole((Role)q.getSingleResult());
+        em.persist(user);
+        trans.commit();
+    } catch(Exception e){
+        if (trans != null && trans.isActive()) {
             trans.rollback();
         }
-            finally {
-            em.close();
-        }
+    } finally {
+        em.close();
     }
+}
 }

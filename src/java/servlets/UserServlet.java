@@ -114,8 +114,8 @@ public class UserServlet extends HttpServlet {
             String bottom = "Add User";
             request.setAttribute("subTitle", bottom);
             RoleDB roleConnection = new RoleDB();
-            ArrayList<Role> roles = new ArrayList<>();
-            roles = (ArrayList<Role>)roleConnection.getall();
+            List<Role> roles = new ArrayList<>();
+            roles = (List<Role>)roleConnection.getall();
             request.setAttribute("roles", roles);
         
         
